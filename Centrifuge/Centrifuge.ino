@@ -51,9 +51,9 @@ static const unsigned long max_speed = 4000;
 double motor_duty = 0;
 double target_speed = 0;
 double motor_setpoint = 0;
-static const double motor_k_p = 0.1;
-static const double motor_k_i = 1;
-static const double motor_k_d = 0.2;
+static const double motor_k_p = 0.25;
+static const double motor_k_i = 0.1;
+static const double motor_k_d = 0.025;
 PID motor_pid(&angular_velocity_smoother.output, &motor_duty, &motor_setpoint, motor_k_p, motor_k_i, motor_k_d, DIRECT);
 
 // Speed ramping
@@ -142,7 +142,7 @@ void loop() {
   // Update motor setpoint
   if (target_speed == 0) {
     ramp_pid.SetMode(MANUAL);
-    motor_setpoint = 0;
+    motor_setpoint = min_speed;
   } else {
     ramp_pid.SetMode(AUTOMATIC);
     ramp_pid.Compute();
@@ -154,9 +154,11 @@ void loop() {
 
   // Update motor effort
   if (motor_setpoint <= min_speed + 1) {
-    motor_pid.SetTunings(motor_k_p, motor_k_i, motor_k_d);
+    motor_pid.SetMode(MANUAL);
+    motor_duty = 0;
   } else {
-    motor_pid.SetTunings(motor_k_p, 0, 0);
+    motor_pid.SetMode(AUTOMATIC);
+    motor_pid.SetTunings(motor_k_p, motor_k_i, motor_k_d);
   }
   motor_pid.Compute();
   analogWrite(motor_pin, motor_duty);
