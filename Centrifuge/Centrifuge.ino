@@ -2,7 +2,9 @@
   Centrifuge
 
   The following libraries must be installed through the Arduino IDE's Library Manager:
-  - EWMA
+  - EWMA by Arsen Torbarina
+  - JC_Button by Jack Christensen
+  - PID by Brett Beauregard
 */
 
 #include <Ewma.h>
@@ -34,10 +36,10 @@ unsigned long tachometer_counter_previous = 0;
 unsigned long tachometer_time_previous = 0;
 unsigned long tachometer_counter_sampling_threshold = 20;
 unsigned long tachometer_time_sampling_threshold = 100;
+double angular_velocity = 0;
 Ewma angular_velocity_smoother(0.2);
 
 // State variables
-double angular_velocity = 0;
 bool running = false;
 
 // Plotting
